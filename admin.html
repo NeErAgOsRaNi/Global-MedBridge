@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#073b87"><title>Admin | Global MedBridge</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+.admin-wrap{width:min(1180px,calc(100% - 32px));margin:38px auto}.admin-card{background:#fff;border:1px solid #e1edf8;border-radius:20px;padding:24px;box-shadow:var(--shadow);margin-bottom:22px}.admin-card h1,.admin-card h2{color:#0a3675;margin-top:0}.admin-form{max-width:440px}.admin-form input{width:100%;padding:13px;border:1px solid #d5e4f1;border-radius:10px;margin:7px 0 15px}.admin-status{margin:12px 0;color:#526d87}.table-wrap{overflow-x:auto}table{width:100%;border-collapse:collapse;min-width:760px}th,td{text-align:left;padding:12px;border-bottom:1px solid #e5eef6;font-size:13px;vertical-align:top}th{color:#315575;background:#f5faff}td select{padding:8px;border:1px solid #d5e4f1;border-radius:8px}.admin-actions{display:flex;gap:10px;flex-wrap:wrap}.small-btn{padding:9px 15px;font-size:13px}.hidden{display:none!important}
+</style>
+</head>
+<body>
+<header class="topbar wrap"><a class="brand" href="index.html"><span class="brand-mark">✚</span><span>Global<span>Med</span>Bridge<small>Administrator dashboard</small></span></a><nav class="nav"><a href="index.html">View website</a></nav></header>
+<main class="admin-wrap">
+<section class="admin-card admin-form" id="loginPanel">
+<h1>Admin sign in</h1><p>Sign in using an administrator account created in Supabase Authentication.</p>
+<form id="loginForm"><label for="email">Email</label><input id="email" type="email" autocomplete="username" required><label for="password">Password</label><input id="password" type="password" autocomplete="current-password" required><button class="btn" type="submit">Sign in</button></form><p class="admin-status" id="loginMessage" role="status"></p>
+</section>
+<section class="admin-card hidden" id="dashboardPanel">
+<div class="admin-actions" style="justify-content:space-between;align-items:center"><div><h1>Enquiries</h1><p>Review incoming enquiries and update their status.</p></div><div class="admin-actions"><button class="btn small-btn" id="refreshButton" type="button">Refresh</button><button class="btn small-btn" id="logoutButton" type="button">Sign out</button></div></div>
+<p class="admin-status" id="dashboardMessage" role="status"></p>
+<div class="table-wrap"><table><thead><tr><th>Received</th><th>Name</th><th>Phone</th><th>Location</th><th>Health concern</th><th>Status</th></tr></thead><tbody id="enquiriesBody"></tbody></table></div>
+</section>
+</main>
+<script src="config.js"></script>
+<script type="module">
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+const cfg = window.GLOBAL_MEDBRIDGE_SUPABASE;
+const supabase = createClient(cfg.url, cfg.publishableKey);
+const loginPanel=document.getElementById('loginPanel');
+const dashboardPanel=document.getElementById('dashboardPanel');
+const loginMessage=document.getElementById('loginMessage');
+const dashboardMessage=document.getElementById('dashboardMessage');
+const body=document.getElementById('enquiriesBody');
+const statusOptions=['new','contacted','in_progress','closed'];
+const escapeHtml=(value)=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+async function showSession(){const {data:{session}}=await supabase.auth.getSession();loginPanel.classList.toggle('hidden',!!session);dashboardPanel.classList.toggle('hidden',!session);if(session)loadEnquiries();}
+async function loadEnquiries(){dashboardMessage.textContent='Loading enquiries…';body.innerHTML='';const {data,error}=await supabase.from('enquiries').select('id,full_name,phone,location,health_concern,status,created_at').order('created_at',{ascending:false}).limit(500);if(error){dashboardMessage.textContent='Could not load enquiries: '+error.message;return;}dashboardMessage.textContent=data.length?`${data.length} enquiry record(s) shown.`:'No enquiries have been received yet.';for(const row of data){const tr=document.createElement('tr');const date=new Date(row.created_at).toLocaleString();tr.innerHTML=`<td>${escapeHtml(date)}</td><td>${escapeHtml(row.full_name)}</td><td>${escapeHtml(row.phone)}</td><td>${escapeHtml(row.location)}</td><td>${escapeHtml(row.health_concern)}</td><td><select aria-label="Update status for ${escapeHtml(row.full_name)}" data-id="${escapeHtml(row.id)}">${statusOptions.map(s=>`<option value="${s}" ${row.status===s?'selected':''}>${s.replace('_',' ')}</option>`).join('')}</select></td>`;body.appendChild(tr);}body.querySelectorAll('select').forEach(select=>select.addEventListener('change',async()=>{select.disabled=true;const {error}=await supabase.from('enquiries').update({status:select.value}).eq('id',select.dataset.id);select.disabled=false;dashboardMessage.textContent=error?'Could not update status: '+error.message:'Status updated.';}));}
+document.getElementById('loginForm').addEventListener('submit',async e=>{e.preventDefault();loginMessage.textContent='Signing in…';const {error}=await supabase.auth.signInWithPassword({email:document.getElementById('email').value,password:document.getElementById('password').value});loginMessage.textContent=error?error.message:'';if(!error)showSession();});
+document.getElementById('logoutButton').addEventListener('click',async()=>{await supabase.auth.signOut();showSession();});
+document.getElementById('refreshButton').addEventListener('click',loadEnquiries);
+supabase.auth.onAuthStateChange(()=>showSession());
+showSession();
+</script>
+</body></html>

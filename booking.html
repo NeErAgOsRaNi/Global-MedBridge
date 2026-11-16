@@ -51,7 +51,7 @@
           <small>Please share only the information needed for your enquiry. Avoid entering highly sensitive medical details in this demo form.</small>
         </div>
         <button class="btn submit" type="submit">Submit Enquiry <span aria-hidden="true">→</span></button>
-        <p class="privacy">Privacy note: This is a front-end demo. Your information is not sent or saved anywhere. Connect a secure backend before collecting real patient information.</p>
+        <p class="privacy">Please share only the minimum information needed for an initial enquiry. Do not submit medical records, reports, prescriptions or emergency details through this form.</p>
         <div class="success" id="success" role="status" aria-live="polite"></div>
       </form>
     </section>
@@ -59,14 +59,6 @@
 </main>
 
 <footer class="footer"><div class="wrap footer-inner"><strong>Global MedBridge</strong><span>Connecting Care, Creating Better Lives</span><a href="index.html">Home</a></div></footer>
-<script>
-document.getElementById('bookingForm').addEventListener('submit', function(event) {
-  event.preventDefault();
-  if (!this.reportValidity()) return;
-  const firstName = document.getElementById('name').value.trim().split(/\\s+/)[0];
-  const success = document.getElementById('success');
-  success.textContent = 'Thank you, ' + firstName + '. The demo form is working, but no enquiry has been sent. A secure backend must be connected to receive bookings.';
-  success.style.display = 'block';
-});
-</script>
+<script src="config.js"></script>
+<script src="booking.js" defer></script>
 </body></html>
