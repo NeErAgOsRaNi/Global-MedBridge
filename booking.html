@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#073b87">
+<title>Book Now | Global MedBridge</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="topbar wrap">
+  <a class="brand" href="index.html"><span class="brand-mark">✚</span><span>Global<span>Med</span>Bridge<small>Connecting Care, Creating Better Lives</small></span></a>
+  <nav class="nav"><a href="index.html">← Back to Home</a></nav>
+</header>
+
+<main class="booking-main">
+  <div class="wrap booking-grid">
+    <section class="booking-intro">
+      <a class="backlink" href="index.html">← Back to homepage</a>
+      <div class="eyebrow"><i></i> Let's get you connected</div>
+      <h1>Start your healthcare enquiry.</h1>
+      <p>Share a few details and let us know what kind of healthcare support you are looking for. The Global MedBridge team can use your enquiry details to follow up with you.</p>
+      <ul class="booking-benefits">
+        <li><b class="check">✓</b> Simple enquiry form</li>
+        <li><b class="check">✓</b> Share your care requirements</li>
+        <li><b class="check">✓</b> Request a follow-up</li>
+        <li><b class="check">✓</b> Mobile-friendly experience</li>
+      </ul>
+    </section>
+
+    <section class="form-card">
+      <h2>Book Now</h2>
+      <p>Enter your details below. Fields marked * are required.</p>
+      <form id="bookingForm">
+        <div class="field">
+          <label for="name">Full Name *</label>
+          <input id="name" name="name" type="text" placeholder="Enter your full name" autocomplete="name" required maxlength="100">
+        </div>
+        <div class="two-col">
+          <div class="field">
+            <label for="phone">Phone Number *</label>
+            <input id="phone" name="phone" type="tel" placeholder="e.g. 9876543210" autocomplete="tel" inputmode="tel" required pattern="[+0-9 ()-]{8,20}" maxlength="20">
+          </div>
+          <div class="field">
+            <label for="location">Location / City *</label>
+            <input id="location" name="location" type="text" placeholder="Your city or area" autocomplete="address-level2" required maxlength="120">
+          </div>
+        </div>
+        <div class="field">
+          <label for="disease">Disease / Health Concern *</label>
+          <textarea id="disease" name="disease" placeholder="Briefly describe the condition or healthcare support you need" required maxlength="1000"></textarea>
+          <small>Please share only the information needed for your enquiry. Avoid entering highly sensitive medical details in this demo form.</small>
+        </div>
+        <button class="btn submit" type="submit">Submit Enquiry <span aria-hidden="true">→</span></button>
+        <p class="privacy">Privacy note: This is a front-end demo. Your information is not sent or saved anywhere. Connect a secure backend before collecting real patient information.</p>
+        <div class="success" id="success" role="status" aria-live="polite"></div>
+      </form>
+    </section>
+  </div>
+</main>
+
+<footer class="footer"><div class="wrap footer-inner"><strong>Global MedBridge</strong><span>Connecting Care, Creating Better Lives</span><a href="index.html">Home</a></div></footer>
+<script>
+document.getElementById('bookingForm').addEventListener('submit', function(event) {
+  event.preventDefault();
+  if (!this.reportValidity()) return;
+  const firstName = document.getElementById('name').value.trim().split(/\\s+/)[0];
+  const success = document.getElementById('success');
+  success.textContent = 'Thank you, ' + firstName + '. The demo form is working, but no enquiry has been sent. A secure backend must be connected to receive bookings.';
+  success.style.display = 'block';
+});
+</script>
+</body></html>
